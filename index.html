@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inorganic Lab Simulator & Study Guide</title>
+    <style>
+        :root {
+            --bg-color: #f5f6fa;
+            --card-bg: #ffffff;
+            --text-main: #2f3640;
+            --primary: #4a69bd;
+            --primary-hover: #1e3d59;
+            --border: #dcdde1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px dashed var(--primary);
+        }
+
+        h1 {
+            margin: 0;
+            color: var(--primary-hover);
+            text-transform: uppercase;
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 18px;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 8px;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin: 12px 0 6px 0;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Test Tube Animation Area */
+        .lab-bench {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 250px;
+            background: #2c3e50;
+            border-radius: 8px;
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .test-tube {
+            width: 50px;
+            height: 180px;
+            border: 3px solid #ecf0f1;
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
+            position: relative;
+            background: rgba(255,255,255,0.1);
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.2);
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .liquid {
+            width: 100%;
+            height: 0%;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            transition: height 0.6s ease, background-color 0.4s ease;
+            position: relative;
+        }
+
+        .ppt {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 0%;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            background: transparent;
+            transition: height 0.8s ease, background 0.4s ease;
+            opacity: 0.85;
+        }
+
+        .fumes {
+            position: absolute;
+            top: -40px;
+            left: 5px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: transparent;
+            filter: blur(8px);
+            transition: background 0.5s ease;
+            opacity: 0.6;
+        }
+
+        .result-text {
+            color: white;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 13px;
+            text-align: center;
+            padding: 0 10px;
+        }
+
+        /* Searchable Ledger Styles */
+        .search-box {
+            margin-bottom: 15px;
+        }
+
+        .reaction-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .reaction-item {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .reaction-item:hover {
+            background-color: var(--bg-color);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Inorganic Chemistry Qualitative Analyzer</h1>
+        <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">Interactive Lab Bench & Reaction Library</p>
+    </header>
+
+    <div class="container">
+        
+        <div class="card">
+            <h2>🧪 Virtual Test Tube Simulator</h2>
+            <p style="font-size: 12px; color: #666; margin-top:-10px;">Select an Ion, add your targeted testing Reagent, and run the reaction.</p>
+            
+            <label for="ionSelect">1. Select Radical / Ion in Solution:</label>
+            <select id="ionSelect" onchange="updateReagents()">
+                <option value="">-- Choose an Ion --</option>
+            </select>
+
+            <label for="reagentSelect">2. Add Reagent / Experimental Step:</label>
+            <select id="reagentSelect">
+                <option value="">-- Select Ion First --</option>
+            </select>
+
+            <button onclick="runReaction()">Mix & Observe Reaction</button>
+
+            <div class="lab-bench">
+                <div class="fumes" id="tubeFumes"></div>
+                <div class="test-tube">
+                    <div class="liquid" id="tubeLiquid">
+                        <div class="ppt" id="tubePpt"></div>
+                    </div>
+                </div>
+                <div class="result-text" id="outputConsole">Bench Ready. Awaiting mixing...</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📚 Quick-Learn Reaction Ledger</h2>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Type an Ion, Compound or Color to filter..." onkeyup="filterReactions()" style="width:100%; padding:8px; border-radius:4px; border:1px solid var(--border);">
+            </div>
+            <div class="reaction-list" id="ledgerList">
+                </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Comprehensive Dataset Compiled Directly From Your Shared Laboratory Notes
+        const reactionData = [
+            // Carbonate & Sulphite
+            { ion: "CO3(2-)", reagent: "Hg(NO3)2", compound: "HgO·HgCO3", colorType: "ppt", colorCode: "#b33939", colorName: "Reddish Brown PPT", desc: "Mercuric Nitrate Test yields standard basic mercuric carbonate." },
+            { ion: "SO3(2-)", reagent: "Lime Water / Baryta Water", compound: "CaSO3 / BaSO3", colorType: "liquid", colorCode: "#e0e0e0", colorName: "White Turbidity", desc: "Turns solution milky/turbid; clearing up with excess acidic context." },
+            { ion: "SO3(2-)", reagent: "K2Cr2O7 + Acid", compound: "Cr(3+)", colorType: "liquid", colorCode: "#227093", colorName: "Green Coloration", desc: "Sulphite gas reduces orange dichromate into distinctive green Chromium ions." },
+            { ion: "SO3(2-)", reagent: "BaCl2", compound: "BaSO3", colorType: "ppt", colorCode: "#ffffff", colorName: "White PPT", desc: "Produces white precipitate soluble in dilute mineral acids." },
+            { ion: "SO3(2-)", reagent: "Lead Acetate", compound: "PbSO3", colorType: "ppt", colorCode: "#ffffff", colorName: "White PPT", desc: "Forms white lead sulphite precipitate." },
+            { ion: "SO3(2-)", reagent: "Starch-Iodate Test", compound: "I2-Starch Complex", colorType: "liquid", colorCode: "#218c74", colorName: "Blue Complex", desc: "Iodate is reduced to Iodine, binding starch indicator dynamically." },
+            
+            // Sulphides
+            { ion: "S(2-)", reagent: "Lead Acetate", compound: "PbS", colorType: "ppt", colorCode: "#2c3e50", colorName: "Black PPT", desc: "Immediate identification of sulphide via dense black lead sulphide layering." },
+            { ion: "S(2-)", reagent: "AgNO3", compound: "Ag2S", colorType: "ppt", colorCode: "#1c1c1c", colorName: "Black PPT", desc: "Silver ions yield highly insoluble black silver sulphide." },
+            { ion: "S(2-)", reagent: "CdCO3", compound: "CdS", colorType: "ppt", colorCode: "#f1c40f", colorName: "Yellow PPT", desc: "Cadmium deposition reveals classic diagnostic pigment coloration." },
+            { ion: "S(2-)", reagent: "Sodium Nitroprusside", compound: "[Fe(CN)5NOS](4-)", colorType: "liquid", colorCode: "#6d5ffd", colorName: "Purple Coloration", desc: "Transient purple/violet configuration complex confirms active alkaline sulphide presence." },
+            { ion: "S(2-)", reagent: "Methylene Blue Test", compound: "Methylene Blue", colorType: "liquid", colorCode: "#2980b9", colorName: "Blue Solution", desc: "Aminodimethylaniline conversion reactions create distinct dye molecules." },
+
+            // Nitrites & Acetates
+            { ion: "NO2(-)", reagent: "Dilute Mineral Acid", compound: "NO2 Gas", colorType: "fumes", colorCode: "#b33939", colorName: "Reddish Brown Fumes", desc: "Evolution of brown nitrogen dioxide gas displaying pungent properties." },
+            { ion: "NO2(-)", reagent: "AgNO3", compound: "AgNO2", colorType: "ppt", colorCode: "#ffffff", colorName: "White PPT", desc: "Precipitated from concentrated nitrite sample solutions." },
+            { ion: "NO2(-)", reagent: "Thiourea Treatment", compound: "Fe(SCN)3", colorType: "liquid", colorCode: "#b33939", colorName: "Blood Red Coloration", desc: "Thiourea interaction produces thiocyanate, turning red with Ferric ions." },
+            { ion: "CH3COO(-)", reagent: "FeCl3 (Neutral)", compound: "[Fe3(OH)2(CH3COO)6]+", colorType: "liquid", colorCode: "#95a5a6", colorName: "Blood Red Solution", desc: "Soluble multimeric complex breaks up on boiling to yield standard reddish-brown basic oxo-salt ppt." },
+            { ion: "CH3COO(-)", reagent: "Boiling Deep Red Solution", compound: "Fe(OH)2CH3COO", colorType: "ppt", colorCode: "#b33939", colorName: "Reddish-Brown PPT", desc: "Thermal degradation precipitates iron content completely." },
+
+            // Chlorides, Bromides & Iodides
+            { ion: "Cl(-)", reagent: "AgNO3 + HNO3", compound: "AgCl", colorType: "ppt", colorCode: "#ffffff", colorName: "White PPT", desc: "Curdy white precipitate effortlessly dissolved inside common ammonia liquor." },
+            { ion: "Cl(-)", reagent: "Chromyl Chloride Test (Solid K2Cr2O7 + H2SO4)", compound: "CrO2Cl2 Gas", colorType: "fumes", colorCode: "#d35400", colorName: "Red Vapour", desc: "Heavy deep orange/red gases evolve when heating solid dry salt mix." },
+            { ion: "Cl(-)", reagent: "Absorb Vapours in NaOH", compound: "CrO4(2-)", colorType: "liquid", colorCode: "#f1c40f", colorName: "Yellow Solution", desc: "Gaseous chromyl chloride reacts forming sodium chromate." },
+            { ion: "Cl(-)", reagent: "Lead Acetate on Yellow Solution", compound: "PbCrO4", colorType: "ppt", colorCode: "#f39c12", colorName: "Yellow PPT", desc: "Confirms existence of chromate, confirming initial chloride composition." },
+            { ion: "Br(-)", reagent: "Conc. H2SO4 + MnO2", compound: "Br2 Gas", colorType: "fumes", colorCode: "#b33939", colorName: "Reddish Brown Gas", desc: "Volatile elemental bromine vaporizes out of acid mix." },
+            { ion: "Br(-)", reagent: "Silver Nitrate Treatment", compound: "AgBr", colorType: "ppt", colorCode: "#fffae6", colorName: "Pale Yellow PPT", desc: "Partially soluble or sparingly reactive with excess ammonia matrix." },
+            { ion: "Br(-)", reagent: "Chlorine Water Layer Test", compound: "Br2 in Organic Phase", colorType: "liquid", colorCode: "#d35400", colorName: "Reddish-Brown Layer", desc: "Displaced molecular bromine dissolves distinctively inside the bottom solvent layer." },
+            { ion: "I(-)", reagent: "Conc. H2SO4 / MnO2", compound: "I2 Vapour", colorType: "fumes", colorCode: "#8e44ad", colorName: "Violet Vapours", desc: "Deep beautiful purple/violet iodine gas evolves upon complete oxidation." },
+            { ion: "I(-)", reagent: "AgNO3", compound: "AgI", colorType: "ppt", colorCode: "#f1c40f", colorName: "Yellow PPT", desc: "Bright yellow silver iodide completely insoluble in basic aqueous media." },
+            { ion: "I(-)", reagent: "Lead Acetate Test", compound: "PbI2", colorType: "ppt", colorCode: "#f1c40f", colorName: "Yellow PPT", desc: "Forms striking yellow target solid compound." },
+            { ion: "I(-)", reagent: "Organic Layer Test", compound: "I2 in Organic Phase", colorType: "liquid", colorCode: "#9b59b6", colorName: "Violet Layer", desc: "Free iodine gathers in the dense chloroform/carbon tetrachloride phase." },
+
+            // Sulfates, Nitrates, Borates, Phosphates
+            { ion: "SO4(2-)", reagent: "BaCl2 Solution", compound: "BaSO4", colorType: "ppt", colorCode: "#ffffff", colorName: "White PPT", desc: "Crystalline white barrier matrix that won't break down inside any dilute standard acids." },
+            { ion: "NO3(-)", reagent: "Brown Ring Assay (FeSO4 + Conc H2SO4)", compound: "[Fe(H2O)5NO](2+)", colorType: "liquid", colorCode: "#795548", colorName: "Brown Ring Interface", desc: "Delicate coordination ring dynamic formed carefully at liquid junction boundaries." },
+            { ion: "NO3(-)", reagent: "Diphenylamine Indicator", compound: "Diphenylamine Complex", colorType: "liquid", colorCode: "#2980b9", colorName: "Blue Ring/Coloration", desc: "Highly sensitive oxidation redox indicator verification." },
+            { ion: "BO3(3-)", reagent: "Ethanol + Conc. H2SO4 Ignite", compound: "B(OC2H5)3 Vapours", colorType: "fumes", colorCode: "#2ecc71", colorName: "Green Flame Edge", desc: "Volatile triethyl borate esters vaporize and burn with a green coloration." },
+            { ion: "PO4(3-)", reagent: "Ammonium Molybdate + HNO3", compound: "(NH4)3PO4·12MoO3", colorType: "ppt", colorCode: "#f1c40f", colorName: "Canary Yellow PPT", desc: "Characteristic bright canary-yellow crystal precipitate generated after gentle warming." },
+            { ion: "PO4(3-)", reagent: "Magnesia Mixture", compound: "Mg(NH4)PO4", colorType: "ppt", colorCode: "#ffffff", colorName: "Gelatinous White PPT", desc: "Forms a distinctly cloudy, gelatinous crystalline solid mass." }
+        ];
+
+        // Populate Main UI Dashboard on Launch
+        function initializeApp() {
+            const ionSelect = document.getElementById('ionSelect');
+            const uniqueIons = [...new Set(reactionData.map(item => item.ion))];
+            
+            uniqueIons.forEach(ion => {
+                let opt = document.createElement('option');
+                opt.value = ion;
+                opt.innerHTML = ion;
+                ionSelect.appendChild(opt);
+            });
+
+            buildLedger(reactionData);
+        }
+
+        // Dynamically shift target reagents according to chosen root ion
+        function updateReagents() {
+            const chosenIon = document.getElementById('ionSelect').value;
+            const reagentSelect = document.getElementById('reagentSelect');
+            reagentSelect.innerHTML = '<option value="">-- Choose Reagent --</option>';
+
+            if(!chosenIon) return;
+
+            const filtered = reactionData.filter(r => r.ion === chosenIon);
+            filtered.forEach(r => {
+                let opt = document.createElement('option');
+                opt.value = r.reagent;
+                opt.innerHTML = r.reagent;
+                reagentSelect.appendChild(opt);
+            });
+        }
+
+        // Run Simulated Animation Sequence on Screen
+        function runReaction() {
+            const ion = document.getElementById('ionSelect').value;
+            const reagent = document.getElementById('reagentSelect').value;
+            const consoleBox = document.getElementById('outputConsole');
+            const liquid = document.getElementById('tubeLiquid');
+            const ppt = document.getElementById('tubePpt');
+            const fumes = document.getElementById('tubeFumes');
+
+            // Reset Tube Display State First
+            liquid.style.height = "0%";
+            ppt.style.height = "0%";
+            fumes.style.background = "transparent";
+
+            if(!ion || !reagent) {
+                consoleBox.innerHTML = "⚠️ Setup Error: Please pick both an Ion and testing Reagent first.";
+                return;
+            }
+
+            const match = reactionData.find(r => r.ion === ion && r.reagent === reagent);
+
+            if(match) {
+                consoleBox.innerHTML = "⚡ Mixing chemicals... watching transformations occur.";
+                
+                setTimeout(() => {
+                    // Animate default clear matrix solution pouring into place
+                    liquid.style.height = "65%";
+                    liquid.style.backgroundColor = "rgba(52, 152, 219, 0.2)"; 
+                    
+                    setTimeout(() => {
+                        // Display targeted reaction results from notes
+                        if(match.colorType === "liquid") {
+                            liquid.style.backgroundColor = match.colorCode;
+                        } else if(match.colorType === "ppt") {
+                            ppt.style.height = "35%";
+                            ppt.style.backgroundColor = match.colorCode;
+                        } else if(match.colorType === "fumes") {
+                            fumes.style.background = match.colorCode;
+                        }
+                        
+                        consoleBox.innerHTML = `<strong>Compound Result:</strong> ${match.compound}<br>
+                                                <strong>Observed Feature:</strong> ${match.colorName}<br>
+                                                <small>${match.desc}</small>`;
+                    }, 500);
+
+                }, 200);
+            }
+        }
+
+        // Render searchable ledger elements
+        function buildLedger(items) {
+            const list = document.getElementById('ledgerList');
+            list.innerHTML = "";
+            items.forEach(item => {
+                let div = document.createElement('div');
+                div.className = "reaction-item";
+                div.innerHTML = `<strong>Ion:</strong> ${item.ion} + <strong>Reagent:</strong> ${item.reagent} <br>
+                                 ➡️ <span style="font-family: monospace;">${item.compound}</span> 
+                                 <span class="tag" style="background-color:${item.colorCode === '#ffffff' || item.colorCode === '#fffae6' ? '#7f8c8d' : item.colorCode}">${item.colorName}</span><br>
+                                 <span style="color:#7f8c8d; font-size:11px;">${item.desc}</span>`;
+                
+                // Clicking an item populates the generator automatically
+                div.onclick = () => {
+                    document.getElementById('ionSelect').value = item.ion;
+                    updateReagents();
+                    document.getElementById('reagentSelect').value = item.reagent;
+                    runReaction();
+                };
+                list.appendChild(div);
+            });
+        }
+
+        // Filter through data values smoothly
+        function filterReactions() {
+            const text = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = reactionData.filter(r => 
+                r.ion.toLowerCase().includes(text) || 
+                r.reagent.toLowerCase().includes(text) || 
+                r.compound.toLowerCase().includes(text) || 
+                r.colorName.toLowerCase().includes(text)
+            );
+            buildLedger(filtered);
+        }
+
+        window.onload = initializeApp;
+    </script>
+</body>
+</html>
